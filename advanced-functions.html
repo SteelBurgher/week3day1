@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advanced Functions</title>
+  <link rel="stylesheet" href="../zzz_lib/styles.css">
+</head>
+<body>
+<div id="container">
+  <h1>Advanced Functions</h1>
+<section>
+  <p>To complete this exercise, download this page and view it in your code editor.</p>
+</section>
+</div>
+<script>
+// A function w/ side effects, but no return value
+// =================================================
+greeter(); // ERROR undefined is not a function: why?
+// definition
+var greeter = function () {
+  console.log("Hello, nice to meet you")
+};
+// invocation
+greeter();
+// A function w/ a return value, but no side effects
+// =================================================
+var greeter = function () {
+  return 'Hello';
+};
+var greeting = greeter();
+// using the return value to compose larger expressions
+console.log(greeting + ", nice to meet you.");
+// [EXERCISE] Define a function that generates a random number and uses jQuery
+// to add it to the page
+// [EXERCISE] Define a function that selects a random sentence from an array and
+// returns it. Save the return value to a variable. Then add it to the page.
+// During every function invocation, you have access to the arguments keyword
+// whether or not you choose to name the passed arguments using parameters
+// =================================================
+var inspector = function () {
+  console.log(arguments);
+};
+inspector(1,5,9);
+inspector('hi', 'howdy', ['hello', 'and', 'how are you?'], {thimble: true});
+// [EXERCISE] Define a function `printer` that takes any number of arguments
+// iterates over them with a `for loop` and uses jQuery to append them to a div#log
+// We can name our inputs for easier access, but they are only available inside
+// our function, and only for the duration of that invocation
+// =================================================
+var punctuation = "!";
+var announcer = function(strings){
+    var prefix = "ATTENTION: "
+    console.log( "Inside announcer: ", prefix, strings, punctuation );
+    return prefix + strings.join(' ') + '!';
+};
+var sentence = announcer(['hello', 'and', 'how are you?'])
+// function definitions are surrounded by one-way mirrors, they can see out and
+// access variables named in their parent scope, but code running out side can't
+// see in to access parameters or variables defined inside.
+console.log( "What about out here?", prefix, strings, punctuation );
+// [EXERCISE] Write a function secretKeeper that defines a variable `secret` inside
+// its code block. Try to access the secret variable from outside the function scope
+// using your JS console. Make sure it's safe!
+// For each ?? below, fill in your guess as to what will be logged. Then check your
+// answer in the console.
+// =================================================
+var word = 'original';
+var wordChanger = function (newWord) {
+    var word = newWord;
+};
+console.log(word); // ??
+console.log(newWord); // ??
+wordChanger('changed');
+console.log(word); // ??
+console.log(newWord); // ??
+// what's different here?
+var wordChanger = function (newWord) {
+    word = newWord;
+};
+console.log(word); // ??
+console.log(newWord); // ??
+wordChanger('changed');
+console.log(word); // ??
+console.log(newWord); // ??
+// multiple levels
+var a,b,c,w,x,y,z;
+var w = 1;
+var a = function () {
+  var x = 2;
+  var b = function () {
+    var y = 3;
+    var c = function () {
+      var z = 4;
+      console.log("INSIDE C: ", 'a: ',a,'b: ',b,'c: ',c,'w: ',w,'x: ',x,'y: ',y,'z: ',z); // ??
+    };
+    c();
+    console.log("INSIDE B: ", 'a: ',a,'b: ',b,'c: ',c,'w: ',w,'x: ',x,'y: ',y,'z: ',z); // ??
+  };
+  b();
+  console.log("INSIDE A: ", 'a: ',a,'b: ',b,'c: ',c,'w: ',w,'x: ',x,'y: ',y,'z: ',z); // ??
+};
+a();
+console.log("GLOBAL SCOPE: ", 'a: ',a,'b: ',b,'c: ',c,'w: ',w,'x: ',x,'y: ',y,'z: ',z); // ??
+// [EXERCISE]
+// Do the following in the global scope
+// 1) Create an array with the names of three heroes inside.
+// 2) Create a storyGenerator function that takes no inputs.
+// 3) Create a `for loop`, to iterate over the heros.
+// 4) Inside the for loop, save a hero to var hero and then invoke the storyGenerator function.
+// Do the following inside storyGenerator
+// 1) Create an array of three heroic actions
+// 2) Define a doActions function that takes no inputs
+// 3) Create a `for loop` to iterate over the actions
+// 4) Inside the for loop, save an action to a var action and then invoke doAction.
+// Do the following inside doActions
+// 1) Construct a sentence from the hero and action variables defined in parent scopes
+// 2) Use jQuery to append each sentence into a div#superhero-stories
+// Functions are values, they can be saved to variables and passed around
+// =================================================
+var sayHi = function () {
+  console.log('hi');
+};
+var greeter = sayHi;
+sayHi();
+greeter();
+sayHi = function () {
+  console.log('meh');
+}
+sayHi(); // ??
+greeter();
+var runner = function (fn) {
+  fn();
+}
+runner( function(){ console.log('okay'); } );
+runner(sayHi);
+runner(greeter);
+runner(sayHi()); // ??
+// =================================================
+// [EXERCISE] Write a function `answerLogger` that takes a function as input,
+// runs it, and places the result in a div#answer
+// We can test answerLogger with this code, we should not need to change it at all.
+answerLogger(function(){
+  return "I should appear in div#answer!";
+});
+// =================================================
+// [EXERCISE] Write a function `answerCollector` that takes an array of functions
+// and runs all of them, each time you run a function, collect its return value
+// and add it to a resultsArray. Return the results array from answerCollector.
+// We can test answerCollector with this code, we should not need to change it at all.
+var fn1 = function () {
+  return "this should be the first value in results array;"
+};
+answerCollector([fn1, function(){ return "this should be the second value in results array;" }]);
+// Not only can functions be passed as inputs, they can also be returned as outputs.
+// =================================================
+var returnsAFunc = function () {
+  return function(){ console.log('BOOP!'); };
+}
+// have we booped yet?
+var boopingFn = returnsAFunc();
+// how about now?
+boopingFn();
+// now?
+// Returned functions retain scope access at the point they were defined. This is
+// called `closure`. The scope chain is established at the point WHERE THE KEYWORD
+// FUNCTION IS, not where it is invoked.
+var returnsAFunc = function () {
+  var word = 'I can see inside';
+  return function(){ console.log('BOOP! ' + word); };
+}
+var word = 'I can see outside';
+returnsAFunc()(); // why two invocation operators?
+                  // what does this log? why?
+var returnsAFunc = function () {
+  var number = 5;
+  return function(){ console.log( "The number is: " + number); };
+}
+var fnRunner = function(func){
+  var number = 3;
+  func();
+}
+var number = 4;
+var fn = returnsAFunc();
+fnRunner(fn); // what will this log?
+// [EXERCISE] Write a function `multipliesBy` that takes a number as input and
+// returns a function that, when invoked with a second number as an argument
+// multiplies the two numbers together
+// We can test multipliesBy with this code, we should not need to change it at all.
+var times5 = multipliesBy(5);
+times5(4); // 20
+var times10 = multipliesBy(10);
+times10(32); // 320
+// [EXERCISE] Write a function myEach that takes a function and an array, and runs
+// that function once for each item in the array, passing in as arguments the item,
+// the index and the entire array.
+// We can test myEach with this code.
+myEach(["hi", "hello", "how are you"], function(message, index, arr){
+  console.log("The message is: ", message);
+  console.log("This is message number: ", index);
+  console.log("Here are all the messages: ", arr);
+});
+// [EXERCISE] Extend myEach so that it handles objects or arrays. hint: `Array.isArray()`
+// If an object is passed in, invoke the function with the value, key, and object
+// We can test myEach with this code.
+var me = {name: 'bob', city: 'Los Angeles', house: 'dirty'};
+var biographicFn = function(value, key, obj){
+  console.log("Hello, my " + key + " is " + value);
+};
+myEach(me, biographicFn);
+// [EXERCISE] Write a function `map` that takes an array or object and a function
+// as inputs, and runs the function once for each item or property, collecting
+// the return values from each invocation into an array and returning that array.
+// We can test map with this code.
+var californication = function(str){ return str + ', dude!'; };
+var arrayOfMessages = map(['hey', 'how are you', 'later'], californication);
+// make sure that they actually show up on the page!
+$('#container').text(arrayOfMessages);
+// =================================================
+// Take a moment to appreciate all the hard work you've put in to become a programmer.
+// You're doing a great job!
+</script>
+</body>
+</html>

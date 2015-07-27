@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>AJAX & JSON</title>
+  <link rel="stylesheet" href="../zzz_lib/styles.css">
+  <link rel="stylesheet" href="../zzz_lib/railscasts.css">
+  <style>
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <h1>AJAX & JSON</h1>
+    <section>
+      <p>Ajax is a means of interacting with servers behind the scenes using JavaScript without having to reload the page. This allows you to create complex interactive web apps that behave like desktop apps. The most famous example is Gmail; it allows you to read, write, and receive emails, all without the need for refreshing the page.</p>
+
+      <h4>Exercise 1</h4>
+      <ol>
+        <li>Visit the following URL in your browser: http://api.openweathermap.org/data/2.5/weather?q=Los%20Angeles&mode=json&units=imperial</li>
+        <li>What does the %20 represent in the <a href="https://en.wikipedia.org/wiki/Query_string">query string</a>? (hint: try this in your JS console, then google it)</li>
+        <p><pre><code class="javascript">encodeURI("Los Angeles");</code></pre></p>
+        <li>Now try the following line of code in your console:</li>
+        <p><pre><code class="javascript">
+$.get('http://api.openweathermap.org/data/2.5/weather?q=Los%20Angeles&mode=json&units=imperial').success(function(weatherData){
+  console.log(weatherData);
+});
+
+        </code></pre></p>
+
+<p>
+  Check your Network tab to see the network request and response in action.
+
+<img src="ajax.png" alt="">
+</p>
+<p>The most common thing to do with ajax data is show it to the user. We can use jQuery to do this, but only in the callback function "toBeRunOnServerResponse". If we try to use the weatherData outside that function, we won't have the response from the server yet.</p>
+<p><pre><code class="javascript">
+var toBeRunOnServerResponse = function(weatherData){
+  $('#container').append(weatherData.main.temp);
+};
+
+$.get('http://api.openweathermap.org/data/2.5/weather?q=Los%20Angeles&mode=json&units=imperial').success(toBeRunOnServerResponse);
+
+</code></pre></p>
+        <li>Create a simple weather page that shows todays high and low temperature, description of weather and time of sunrise and sunset. (hint: new Date(weatherData.sys.sunrise * 1000); )</li>
+      </ol>
+
+    </section>
+
+    <section>
+      <h4>Exercise 2</h4>
+
+<p>Now let's try more complex interaction using a <a href="javascript:undefined" class='tooltip' data-tip="An endpoint, available over a network, that serves JSON data in a predictable format based on that resource's name. e.g. a post with the id of 7 is available at the path '/posts/7'">RESTful API</a>.</p>
+<pre><code class="javascript">
+// Here's a slightly more complex way to do the same work as above.
+// the server lives at 'http://jsonplaceholder.typicode.com'
+// the path to the info we want: '/posts/1'
+
+$.ajax({
+  url: 'http://jsonplaceholder.typicode.com/posts/1',
+  method: 'GET',
+  success: function(data) {
+    console.log(data);
+  }
+});
+      </code></pre>
+      <p>Using <a href="http://jsonplaceholder.typicode.com/">PlaceHolder JSON</a></p>
+      <ol>
+        <li>Retrieve the post with id of 1 from the server, in the success callback, display it on the page.</li>
+        <li>Retrieve the post with id of 2 from the server, in the success callback, display it on the page.</li>
+        <li>Abstract the success callback out into a separate function called placePostOnPage.</li>
+        <li>Using a for loop, use ajax calls to fetch posts with ids from 1 to 10 and pass them to your placePostOnPage function to display them on the page.</li>
+        <li>Now instead, use the '/posts' endpoint to get all posts and display only their titles on the page. This is often called the "index" view.</li>
+        <li>When a visitor clicks on the title of a post, clear the content area and replace it with the full information for that post, displaying all of its properties. This is often called the "show" view.</li>
+        <li>Allow the user to navigate back to the "index" view from the "show" view.</li>
+        <li>Network requests are expensive and slow. Refactor your code such that once you've fetched data once, it's cached as a javascript object and accessible immediately when the user moves back and forth between 'show' and 'index' views.</li>
+        <li>When showing an individual post, fetch all '/comments' and append the ones whose 'postId' property matches the post's id.</li>
+        <li>Fetch information about the user who made the post. Display their name and email under the post.</li>
+        <li>Create a simple login form where users can input their email address and password (let's say their password is their zip code, which we can also find on the user objects) such that visitors can only see their own posts and comments and only after they log in.</li>
+        <li>Create forms to allow users to create a new post or edit existing posts, pointing the forms to the appropriate RESTful endpoints using either the form submission protocol or `$.post()`</li>
+      </ol>
+    </section>
+
+    <section>
+      <h3>About JSON (a look under the hood)</h3>
+      <p>Because we can only send strings of text (or binary data) over a network, not arrays and objects, modern sites convert their data to JSON (JavaScript Object Notation) format, and your jQuery $.ajax() callback converts it back to arrays, objects, and values. Check out <a href="http://learnxinyminutes.com/docs/json/">this example</a>. Here is what is happening for you behind the scenes (try it out in your console w/ your amazon objects):</p>
+<pre><code class="javascript">
+  // run these one line at a time in your console.
+
+  // the server does this before sending information over the wire
+  var jsonStringedBook = JSON.stringify(book1);
+  typeof jsonStringedBook;
+
+  // $.ajax() converts it back before passing it into your callback function.
+  JSON.parse(jsonStringedBook);
+</code></pre>
+    </section>
+  </div>
+  <script>
+    // Rebuilding Amazon
+    // =================================================
+  </script>
+
+  <script src="../zzz_lib/jquery.js"></script>
+  <script src="../zzz_lib/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>
